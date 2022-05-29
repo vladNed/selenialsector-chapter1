@@ -4,19 +4,26 @@ use ndarray::{arr3, Array3, Axis, s};
 use crate::utils::Vector2D;
 
 use super::edge::Edge;
+use super::stats::{GUIStats, PlayerName, TerminalName};
 
 static DEFAULT_MARGIN: f32 = 20.0;
 static LOWER_MARGIN: f32 = 100.0;
 
 
 pub struct GUI {
-    edges: Vec<Edge>
+    edges: Vec<Edge>,
+    stats: GUIStats
 }
 
 impl GUI {
     pub fn new(ctx: &mut Context) -> GameResult<Self> {
+
+        let username = PlayerName::new("Vlad".to_string());
+        let term_name = TerminalName::new("0001-0001".to_string());
+
         Ok(Self {
-            edges: Self::build_edges(ctx)?
+            edges: Self::build_edges(ctx)?,
+            stats: GUIStats::new(vec![username, term_name], ctx)?
         })
     }
 
@@ -25,9 +32,15 @@ impl GUI {
     }
 
     pub fn display(&self, ctx: &mut Context) -> GameResult {
+
+        // Display edges
         for edge in self.edges.iter() {
             edge.display(ctx)?;
         }
+
+        // Display stats
+        self.stats.display(ctx)?;
+
         Ok(())
     }
 
@@ -56,13 +69,13 @@ impl GUI {
         let(max_width, max_height) = graphics::drawable_size(ctx);
         arr3(&[
             // Upper [heights, widths]
-            [[DEFAULT_MARGIN, DEFAULT_MARGIN], [DEFAULT_MARGIN, max_width - DEFAULT_MARGIN]],
+            [[DEFAULT_MARGIN*2.0, DEFAULT_MARGIN*2.0], [DEFAULT_MARGIN, max_width - DEFAULT_MARGIN]],
             // Lower [heights, widths]
             [[max_height - LOWER_MARGIN, max_height - LOWER_MARGIN], [DEFAULT_MARGIN, max_width - DEFAULT_MARGIN]],
             // Left [heights, widths]
-            [[DEFAULT_MARGIN, max_height - LOWER_MARGIN], [DEFAULT_MARGIN, DEFAULT_MARGIN]],
+            [[DEFAULT_MARGIN*2.0, max_height - LOWER_MARGIN], [DEFAULT_MARGIN, DEFAULT_MARGIN]],
             // Right [heights, widths]
-            [[DEFAULT_MARGIN, max_height - LOWER_MARGIN], [max_width - DEFAULT_MARGIN, max_width - DEFAULT_MARGIN]]
+            [[DEFAULT_MARGIN*2.0, max_height - LOWER_MARGIN], [max_width - DEFAULT_MARGIN, max_width - DEFAULT_MARGIN]]
         ])
     }
 }

@@ -2,6 +2,7 @@ pub mod gui;
 mod utils;
 
 use std::fs::File;
+use std::path::{PathBuf, self};
 
 use ggez::conf::Conf;
 use ggez::{Context, ContextBuilder, GameResult};
@@ -13,6 +14,7 @@ use gui::GUI;
 
 static DEFAULT_BACKGROUND_COL: Color = Color::BLACK;
 static SETTINGS_PATH: &str = "Settings.toml";
+static STATIC_FILES_PATH: &str = "./static";
 
 
 fn get_config() -> GameResult<Conf> {
@@ -22,11 +24,16 @@ fn get_config() -> GameResult<Conf> {
     Ok(conf)
 }
 
+fn get_resources_dir() -> PathBuf {
+    path::PathBuf::from(STATIC_FILES_PATH)
+}
+
 fn main() -> GameResult{
 
     // Make a Context.
     let (mut ctx, event_loop) = ContextBuilder::new("selenialSector", "Vlad")
         .default_conf(get_config()?)
+        .add_resource_path(get_resources_dir())
         .build()
         .expect("Could not create game context");
 

@@ -5,14 +5,6 @@ use crate::utils::Vector2D;
 
 /// Represents an edge of the gui screen
 pub struct Edge {
-
-    /// Starting point of the edge
-    start: Vector2D,
-
-    /// End point of the edge
-    end: Vector2D,
-
-    /// Body
     mesh: Mesh
 }
 
@@ -21,7 +13,7 @@ impl Edge {
         let line = MeshBuilder::new()
             .line(&[x.as_vec(), y.as_vec()], 2.0, Color::WHITE)?
             .build(ctx)?;
-        Ok(Self{start: x, end: y, mesh: line})
+        Ok(Self{mesh: line})
     }
 
     pub fn display(&self, ctx: &mut Context) -> GameResult {
