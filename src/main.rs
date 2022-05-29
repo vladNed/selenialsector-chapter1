@@ -44,19 +44,22 @@ fn main() -> GameResult{
 }
 
 struct MainState {
-    gui: GUI
+    gui: GUI,
+    temp: String
 }
 impl MainState {
     fn new(ctx: &mut Context) -> GameResult<Self> {
         Ok(Self {
-            gui: GUI::new(ctx)?
+            gui: GUI::new(ctx)?,
+            temp: String::new()
         })
     }
 }
 
 impl EventHandler for MainState {
-    fn update(&mut self, _ctx: &mut Context) -> GameResult<()> {
-        // Update code here...
+    fn update(&mut self, ctx: &mut Context) -> GameResult<()> {
+        self.gui.update(ctx, self.temp.to_owned())?;
+        self.temp.clear();
         Ok(())
     }
 
@@ -64,5 +67,10 @@ impl EventHandler for MainState {
         graphics::clear(ctx, DEFAULT_BACKGROUND_COL);
         self.gui.display(ctx)?;
         graphics::present(ctx)
+    }
+
+    fn key_down_event(&mut self, ctx: &mut Context, keycode: event::KeyCode, _keymods: event::KeyMods, _repeat: bool) {
+        let keychar = format!("{:?}", keycode);
+        self.temp = keychar
     }
 }

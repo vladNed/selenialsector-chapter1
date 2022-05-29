@@ -3,6 +3,7 @@ use ndarray::{arr3, Array3, Axis, s};
 
 use crate::utils::Vector2D;
 
+use super::command::{TerminalInput, TerminalOp};
 use super::edge::Edge;
 use super::stats::{GUIStats, PlayerName, TerminalName};
 
@@ -12,7 +13,8 @@ static LOWER_MARGIN: f32 = 100.0;
 
 pub struct GUI {
     edges: Vec<Edge>,
-    stats: GUIStats
+    stats: GUIStats,
+    term_input: TerminalInput
 }
 
 impl GUI {
@@ -20,15 +22,31 @@ impl GUI {
 
         let username = PlayerName::new("Vlad".to_string());
         let term_name = TerminalName::new("0001-0001".to_string());
+        let term_input = TerminalInput::new();
 
         Ok(Self {
             edges: Self::build_edges(ctx)?,
-            stats: GUIStats::new(vec![username, term_name], ctx)?
+            stats: GUIStats::new(vec![username, term_name], ctx)?,
+            term_input
         })
     }
 
-    pub fn update(&mut self, _ctx: &mut Context) {
-        todo!()
+    pub fn update(&mut self, _ctx: &mut Context, new_input: String) -> GameResult{
+        let op: TerminalOp;
+        if new_input.len() > 1 {
+            op = match new_input.as_str() {
+                "Delete" => super::command::TerminalOp::Clear,
+                "Back" => super::command::TerminalOp::Backspace,
+                "Return" => super::command::TerminalOp::Enter,
+                "Space" => super::command::TerminalOp::Add { val: " ".to_string() },
+                _ => super::command::TerminalOp::None
+            };
+        } else {
+            op = TerminalOp::Add { val: new_input.to_owned() };
+        }
+
+        self.term_input.update(op);
+        Ok(())
     }
 
     pub fn display(&self, ctx: &mut Context) -> GameResult {
@@ -40,6 +58,9 @@ impl GUI {
 
         // Display stats
         self.stats.display(ctx)?;
+
+        // Display input
+        self.term_input.display(ctx)?;
 
         Ok(())
     }
