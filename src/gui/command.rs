@@ -1,4 +1,4 @@
-use ggez::graphics::{Text, Font, self};
+use ggez::graphics::{Text, Font, self, Color};
 use ggez::{Context, GameResult};
 
 use crate::utils::Vector2D;
@@ -15,11 +15,15 @@ pub enum TerminalOp {
 }
 
 pub struct TerminalInput {
-    text: String
+    text: String,
+    font: Font
 }
 impl TerminalInput {
-    pub fn new() -> Self {
-        Self {text: String::new()}
+    pub fn new(ctx: &mut Context) -> GameResult<Self> {
+        Ok(Self {
+            text: String::new(),
+            font: Font::new(ctx, FONT_PATH)?
+        })
     }
 
     pub fn add(&mut self, value: String) {
@@ -36,21 +40,28 @@ impl TerminalInput {
         }
     }
 
-    fn build(&self, ctx: &mut Context) -> GameResult<Text> {
-        let font = Font::new(ctx, FONT_PATH)?;
-        let mut body = String::from("<admin-001> $ ");
-        body.push_str(&self.text);
-        body.push_str("|");
-        let text = Text::new((body.to_owned(), font, 18.0));
+    fn build(&self, ctx: &mut Context) -> GameResult {
+        let pos = Vector2D::new(130.0, 530.0);
+        let mut user_input_body = self.text.to_owned();
+        user_input_body.push_str("_");
+        let text = Text::new((user_input_body.to_owned(), self.font, 18.0));
 
-        Ok(text)
+        graphics::draw(ctx, &text, (pos.as_vec(), ))
+    }
+
+    fn draw_terminal_info(&self, ctx: &mut Context) -> GameResult {
+        let pos = Vector2D::new(20.0, 530.0);
+
+        let term_info_body = String::from("<admin-001> $ ");
+        let term_info_text = Text::new((term_info_body.to_owned(), self.font, 18.0));
+
+        graphics::draw(ctx, &term_info_text, (pos.as_vec(), Color::MAGENTA))
     }
 
     pub fn display(&self, ctx: &mut Context) -> GameResult {
-        let text = self.build(ctx)?;
-        let dest_point = Vector2D::new(20.0, 530.0);
-
-        graphics::draw(ctx, &text, (dest_point.as_vec(), ))
+        self.build(ctx)?;
+        self.draw_terminal_info(ctx)?;
+        Ok(())
     }
 
     pub fn update(&mut self, op: TerminalOp) {

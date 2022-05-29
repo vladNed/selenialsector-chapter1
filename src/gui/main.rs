@@ -22,7 +22,7 @@ impl GUI {
 
         let username = PlayerName::new("Vlad".to_string());
         let term_name = TerminalName::new("0001-0001".to_string());
-        let term_input = TerminalInput::new();
+        let term_input = TerminalInput::new(ctx)?;
 
         Ok(Self {
             edges: Self::build_edges(ctx)?,
