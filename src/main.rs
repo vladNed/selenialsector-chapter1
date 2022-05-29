@@ -1,3 +1,6 @@
+pub mod gui;
+mod utils;
+
 use std::fs::File;
 
 use ggez::conf::Conf;
@@ -5,7 +8,8 @@ use ggez::{Context, ContextBuilder, GameResult};
 use ggez::graphics::{self, Color};
 use ggez::event::{self, EventHandler};
 
-pub mod gui;
+use gui::GUI;
+
 
 static DEFAULT_BACKGROUND_COL: Color = Color::BLACK;
 static SETTINGS_PATH: &str = "Settings.toml";
@@ -21,20 +25,26 @@ fn get_config() -> GameResult<Conf> {
 fn main() -> GameResult{
 
     // Make a Context.
-    let (ctx, event_loop) = ContextBuilder::new("selenialSector", "Vlad")
+    let (mut ctx, event_loop) = ContextBuilder::new("selenialSector", "Vlad")
         .default_conf(get_config()?)
         .build()
         .expect("Could not create game context");
 
-    let main_state = MainState::new();
+    let main_state = MainState::new(&mut ctx);
 
     // Run!
-    event::run(ctx, event_loop, main_state);
+    event::run(ctx, event_loop, main_state?);
 }
 
-struct MainState;
+struct MainState {
+    gui: GUI
+}
 impl MainState {
-    fn new() -> Self { Self {}}
+    fn new(ctx: &mut Context) -> GameResult<Self> {
+        Ok(Self {
+            gui: GUI::new(ctx)?
+        })
+    }
 }
 
 impl EventHandler for MainState {
@@ -43,9 +53,9 @@ impl EventHandler for MainState {
         Ok(())
     }
 
-    fn draw(&mut self, ctx: &mut Context) -> GameResult<()> {
+    fn draw(&mut self, ctx: &mut Context) -> GameResult {
         graphics::clear(ctx, DEFAULT_BACKGROUND_COL);
-        // Draw code here...
+        self.gui.display(ctx)?;
         graphics::present(ctx)
     }
 }

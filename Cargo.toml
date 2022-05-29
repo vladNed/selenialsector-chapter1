@@ -8,3 +8,4 @@ edition = "2021"
 [dependencies]
 ggez = "0.7"
 glam = { version = "0.20", features = ["mint"] }
+ndarray = "0.15.4"
