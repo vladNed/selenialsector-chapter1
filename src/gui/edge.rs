@@ -3,6 +3,7 @@ use ggez::{Context, GameResult};
 
 use crate::utils::Vector2D;
 
+#[derive(Clone)]
 /// Represents an edge of the gui screen
 pub struct Edge {
     mesh: Mesh

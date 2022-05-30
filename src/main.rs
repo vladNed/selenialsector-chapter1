@@ -2,20 +2,18 @@ pub mod gui;
 mod utils;
 
 use std::fs::File;
-use std::path::{PathBuf, self};
+use std::path::{self, PathBuf};
 
 use ggez::conf::Conf;
-use ggez::{Context, ContextBuilder, GameResult};
-use ggez::graphics::{self, Color};
 use ggez::event::{self, EventHandler};
+use ggez::graphics::{self, Color};
+use ggez::{Context, ContextBuilder, GameResult};
 
 use gui::GUI;
-
 
 static DEFAULT_BACKGROUND_COL: Color = Color::BLACK;
 static SETTINGS_PATH: &str = "Settings.toml";
 static STATIC_FILES_PATH: &str = "./static";
-
 
 fn get_config() -> GameResult<Conf> {
     let mut config_file = File::open(SETTINGS_PATH)?;
@@ -28,8 +26,7 @@ fn get_resources_dir() -> PathBuf {
     path::PathBuf::from(STATIC_FILES_PATH)
 }
 
-fn main() -> GameResult{
-
+fn main() -> GameResult {
     // Make a Context.
     let (mut ctx, event_loop) = ContextBuilder::new("selenialSector", "Vlad")
         .default_conf(get_config()?)
@@ -45,13 +42,13 @@ fn main() -> GameResult{
 
 struct MainState {
     gui: GUI,
-    temp: String
+    temp: String,
 }
 impl MainState {
     fn new(ctx: &mut Context) -> GameResult<Self> {
         Ok(Self {
             gui: GUI::new(ctx)?,
-            temp: String::new()
+            temp: String::new(),
         })
     }
 }
@@ -69,7 +66,13 @@ impl EventHandler for MainState {
         graphics::present(ctx)
     }
 
-    fn key_down_event(&mut self, ctx: &mut Context, keycode: event::KeyCode, _keymods: event::KeyMods, _repeat: bool) {
+    fn key_down_event(
+        &mut self,
+        _ctx: &mut Context,
+        keycode: event::KeyCode,
+        _keymods: event::KeyMods,
+        _repeat: bool,
+    ) {
         let keychar = format!("{:?}", keycode);
         self.temp = keychar
     }
