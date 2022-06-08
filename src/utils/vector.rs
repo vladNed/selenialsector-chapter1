@@ -1,11 +1,11 @@
-use std::ops::AddAssign;
+use std::ops::{AddAssign, Add};
 
 #[derive(Debug, Clone, Copy)]
-pub struct Vector2D {
-    x: f32,
-    y: f32,
+pub struct Point2D {
+    pub x: f32,
+    pub y: f32,
 }
-impl Vector2D {
+impl Point2D {
     pub fn new(x: f32, y: f32) -> Self {
         Self { x, y }
     }
@@ -15,9 +15,20 @@ impl Vector2D {
     }
 }
 
-impl AddAssign for Vector2D {
+impl AddAssign for Point2D {
     fn add_assign(&mut self, rhs: Self) {
         self.x += rhs.x;
         self.y += rhs.y;
+    }
+}
+
+impl Add for Point2D {
+    type Output = Point2D;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        Self {
+            x: self.x + rhs.x,
+            y: self.y + rhs.y
+        }
     }
 }

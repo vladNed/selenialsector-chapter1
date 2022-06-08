@@ -3,9 +3,9 @@ use ggez::{
     Context, GameResult,
 };
 
-use super::Vector2D;
+use super::Point2D;
 
-type Line = (Vector2D, String);
+type Line = (Point2D, String);
 
 /// Iterable text data source.
 ///
@@ -17,8 +17,8 @@ type Line = (Vector2D, String);
 ///
 /// The queue will automatically be cleared once the last item in is
 /// returned by the iterator.
-#[derive(Clone)]
-struct TextQueue {
+#[derive(Clone, Debug)]
+pub struct TextQueue {
     /// Raw data received when loading
     data: String,
 
@@ -99,10 +99,13 @@ impl Iterator for TextQueue {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct TextBox {
     /// Represents the 2D position on the display
-    display_cursor: Vector2D,
+    pub display_cursor: Point2D,
+
+    /// Represents the lines of the text
+    pub lines: Vec<Line>,
 
     /// Width of the textbox in pixels
     width: f32,
@@ -110,8 +113,6 @@ pub struct TextBox {
     /// Represents the line position in the lines array
     lines_cursor: usize,
 
-    /// Represents the lines of the text
-    lines: Vec<Line>,
 
     /// Line length index
     current_line_length: f32,
@@ -124,7 +125,7 @@ pub struct TextBox {
     checkpoint: f32,
 
     /// Iterable data source for text
-    text_queue: TextQueue
+    pub text_queue: TextQueue
 }
 
 impl TextBox {
@@ -133,7 +134,7 @@ impl TextBox {
         font: Font,
         font_size: f32,
         text: String,
-        start_vector: Vector2D
+        start_vector: Point2D
     ) -> Self {
         let default_line: Line = (start_vector, String::new());
         let mut text_queue = TextQueue::new();
@@ -153,28 +154,30 @@ impl TextBox {
     }
 
     pub fn new_line(&mut self) {
-        self.display_cursor += Vector2D::new(0.0, 10.0);
+        self.display_cursor += Point2D::new(0.0, self.font_size);
         self.lines.push((self.display_cursor, String::new()));
         self.lines_cursor += 1;
         self.current_line_length = 0 as f32;
         self.checkpoint = 0.0;
     }
 
-    pub fn blank_line(&mut self) {
+    pub fn _blank_line(&mut self) {
         self.new_line();
         self.new_line();
     }
 
-    pub fn update(&mut self) {
+    pub fn update(&mut self) -> Option<()>{
         let (next_char, word_size) = match self.text_queue.next() {
             Some(res) => res,
-            None => return
+            None => return None
         };
         self.add_checkpoint(word_size);
         self.add_new_line_if_needed(word_size);
 
         self.lines[self.lines_cursor].1.push(next_char);
         self.current_line_length += 10.0;
+
+        Some(())
     }
 
     pub fn display(&self, ctx: &mut Context) -> GameResult {

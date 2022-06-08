@@ -1,1 +1,6 @@
+# Rust builds
 /target
+
+# IDEs
+.idea
+.vscode

@@ -1,13 +1,14 @@
+use ggez::event;
 use ggez::graphics::{self, Font};
 use ggez::{Context, GameResult};
 use ndarray::{arr3, s, Array3, Axis};
 
-use crate::utils::Vector2D;
+use crate::utils::Point2D;
 
-use super::command::{TerminalInput, TerminalOp};
+use super::command::TerminalInput;
+use super::stats::{GUIStats, PlayerName, TerminalName};
 use super::edge::Edge;
 use super::screen::Screen;
-use super::stats::{GUIStats, PlayerName, TerminalName};
 
 static DEFAULT_MARGIN: f32 = 20.0;
 static LOWER_MARGIN: f32 = 100.0;
@@ -38,28 +39,12 @@ impl GUI {
         })
     }
 
-    pub fn update(&mut self, ctx: &mut Context, new_input: String) -> GameResult {
-        let op: TerminalOp;
-        if new_input.len() > 1 {
-            op = match new_input.as_str() {
-                "Delete" => super::command::TerminalOp::Clear,
-                "Back" => super::command::TerminalOp::Backspace,
-                "Return" => super::command::TerminalOp::Enter,
-                "Space" => super::command::TerminalOp::Add {
-                    val: " ".to_string(),
-                },
-                _ => super::command::TerminalOp::None,
-            };
-        } else {
-            op = TerminalOp::Add {
-                val: new_input.to_owned(),
-            };
-        }
+    pub fn update(&mut self, ctx: &mut Context, new_input: Option<event::KeyCode>) -> GameResult {
         // Update terminal input
-        self.term_input.update(op);
+        self.term_input.update();
 
         // Update terminal screen
-        self.screen.update(ctx)?;
+        self.screen.update(ctx, new_input)?;
 
         Ok(())
     }
@@ -97,8 +82,8 @@ impl GUI {
     }
 
     fn build_edge(heights: Vec<f32>, widths: Vec<f32>, ctx: &mut Context) -> GameResult<Edge> {
-        let start = Vector2D::new(widths[0], heights[0]);
-        let end = Vector2D::new(widths[1], heights[1]);
+        let start = Point2D::new(widths[0], heights[0]);
+        let end = Point2D::new(widths[1], heights[1]);
 
         Ok(Edge::new(start, end, ctx)?)
     }
@@ -128,4 +113,5 @@ impl GUI {
             ],
         ])
     }
+
 }

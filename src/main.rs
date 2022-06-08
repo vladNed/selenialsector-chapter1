@@ -1,5 +1,6 @@
 pub mod gui;
 mod utils;
+mod dialogue;
 
 use std::fs::File;
 use std::path::{self, PathBuf};
@@ -42,21 +43,21 @@ fn main() -> GameResult {
 
 struct MainState {
     gui: GUI,
-    temp: String,
+    temp: Option<event::KeyCode>,
 }
 impl MainState {
     fn new(ctx: &mut Context) -> GameResult<Self> {
         Ok(Self {
             gui: GUI::new(ctx)?,
-            temp: String::new(),
+            temp: None,
         })
     }
 }
 
 impl EventHandler for MainState {
     fn update(&mut self, ctx: &mut Context) -> GameResult<()> {
-        self.gui.update(ctx, self.temp.to_owned())?;
-        self.temp.clear();
+        self.gui.update(ctx, self.temp)?;
+        self.temp = None;
         Ok(())
     }
 
@@ -73,7 +74,6 @@ impl EventHandler for MainState {
         _keymods: event::KeyMods,
         _repeat: bool,
     ) {
-        let keychar = format!("{:?}", keycode);
-        self.temp = keychar
+        self.temp = Some(keycode);
     }
 }

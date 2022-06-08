@@ -1,7 +1,7 @@
 use ggez::graphics::{self, Font, Text};
 use ggez::{Context, GameResult};
 
-use crate::utils::Vector2D;
+use crate::utils::Point2D;
 
 static STATS_SEPARATOR: &str = "  |  ";
 static STATS_FONT_SIZE: f32 = 18.0;
@@ -77,7 +77,7 @@ impl GUIStats {
     }
 
     pub fn display(&self, ctx: &mut Context) -> GameResult {
-        let dest_point = Vector2D::new(20.0, 15.0);
+        let dest_point = Point2D::new(20.0, 15.0);
         let text = Text::new((self.build_stats_text_body(), self.font, STATS_FONT_SIZE));
 
         graphics::draw(ctx, &text, (dest_point.as_vec(),))
